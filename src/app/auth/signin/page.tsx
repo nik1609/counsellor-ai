@@ -50,7 +50,7 @@ export default function SignIn () {
                 //register the user
                 const response = await fetch('/api/auth/register',{
                     method: 'POST',
-                    headers: {'Contet-Type': 'application/json'},
+                    headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify(formData)
                 })
                 if(!response.ok) {
@@ -125,7 +125,7 @@ export default function SignIn () {
             </div>
 
             {/* email and password */}
-            <form className="space-y-4">
+            <form className="space-y-4" onSubmit={handleEmailPasswordAuth}>
                 {isSignUp && (
                     <div className="space-y-2">
                         <label className="text-sm font-medium ">Full Name</label>
