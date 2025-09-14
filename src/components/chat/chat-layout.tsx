@@ -11,9 +11,9 @@ export function ChatLayout() {
     const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null)
 
     return (
-    <div className="flex h-screen bg-white dark: bg-gray-900">
+    <div className="flex h-screen bg-white dark:bg-gray-900">
         {isSidebarOpen && (
-            <div className="bg-black/20 fixed inset-0 backdrop-blur-sm z-40 md:hidden "
+            <div className="bg-black/20 fixed inset-0 backdrop-blur-sm z-40 md:hidden"
             onClick={()=> setIsSidebarOpen(false)}
             />
         )}
@@ -30,17 +30,16 @@ export function ChatLayout() {
         />
     </div>
     {/* Main chat area */}
-    <div className="flex-1 flex flex-col min-w-0">
-        <div className="md:hidden flex items-center p-4 border-b"
-        >
+    <div className="flex-1 flex flex-col min-w-0 h-screen">
+        <div className="md:hidden flex items-center p-4 border-b">
             <Button
             variant={"ghost"}
             size={"sm"}
             onClick={()=> setIsSidebarOpen(true)}
             >
-                <Menu className="ml-2 font-semibold"/>
+                <Menu className="h-4 w-4"/>
             </Button>
-        <h1 className="ml-2 font-semibold">AI Career Counsellor</h1>
+        <h1 className="ml-2 font-semibold">CareerWise AI</h1>
 
         </div>
         <ChatArea sessionId={selectedSessionId}/>

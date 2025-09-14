@@ -12,8 +12,8 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: "AI Career Counselor",
-  description: "Get personalized career guidance from our AI counselor",
+  title: "CareerWise AI",
+  description: "Get personalized career guidance and advice from our AI counselor",
 };
 
 export default function RootLayout({

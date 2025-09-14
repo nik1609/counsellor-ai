@@ -151,5 +151,40 @@ export const chatRouter = createTRPCRouter({
                 ...userMessage,
                 role: userMessage.role.toLowerCase() as 'user' | 'assistant',
             }
+        }),
+    // delete session
+    deleteSession: protectedProcedure
+        .input(
+            z.object({
+                sessionId: z.string()
+            })
+        )
+        .mutation(async ({input, ctx}) => {
+            const {sessionId} = input
+            const userId = ctx.user.id!
+
+            // verify session exists and belongs to user
+            const session = await prisma.chatSession.findUnique({
+                where: {id: sessionId},
+            })
+
+            if(!session || session.userId !== userId) {
+                throw new TRPCError({
+                    code: 'NOT_FOUND',
+                    message: 'Session not found or unauthorized',
+                })
+            }
+
+            // delete all messages first (cascade should handle this, but being explicit)
+            await prisma.message.deleteMany({
+                where: {sessionId}
+            })
+
+            // delete the session
+            await prisma.chatSession.delete({
+                where: {id: sessionId}
+            })
+
+            return {success: true}
         })
 })

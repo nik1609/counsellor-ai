@@ -6,11 +6,12 @@ import { useTheme } from "next-themes"
 import { useState } from "react"
 import { toast } from "sonner"
 import { Button } from "../ui/button"
-import { LogOut, MessageSquare, MoreHorizontal, Plus, Settings } from "lucide-react"
+import { LogOut, MessageSquare, Moon, MoreHorizontal, Plus, Settings, Sun, User } from "lucide-react"
 import { ScrollArea } from "@radix-ui/react-scroll-area"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu"
 import { Separator } from "../ui/separator"
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
+import { Switch } from "../ui/switch"
 
 interface SidebarProps {
     selectedSessionId: string | null
@@ -36,16 +37,13 @@ export function Sidebar({selectedSessionId, onSelectSession, onCloseSlider}: Sid
 
     const createSessionMutation = trpc.chat.createSession.useMutation({
         onSuccess: (newSession) => {
-            utils.chat.getMessages.invalidate().then(
-                () => {
-                    toast.success('New chat session created!')
-                    onSelectSession(newSession.id)
-                    setIsCreatingSession(false)
-                }
-                
-            )
+            // Invalidate and refetch sessions to update the sidebar
+            utils.chat.getSessions.invalidate()
+            toast.success('New chat session created!')
+            onSelectSession(newSession.id)
+            setIsCreatingSession(false)
         },
-        onError: (error) => {
+        onError: () => {
             toast.error('Failed to create session')
             setIsCreatingSession(false)
         }
@@ -55,6 +53,28 @@ export function Sidebar({selectedSessionId, onSelectSession, onCloseSlider}: Sid
         setIsCreatingSession(true)
         createSessionMutation.mutate({})
 
+    }
+
+    const deleteSessionMutation = trpc.chat.deleteSession.useMutation({
+        onSuccess: () => {
+            // Invalidate and refetch sessions to update the sidebar
+            utils.chat.getSessions.invalidate()
+            toast.success('Chat deleted successfully')
+        },
+        onError: () => {
+            toast.error('Failed to delete chat')
+        }
+    })
+
+    const handleDeleteSession = async (sessionId: string, e: React.MouseEvent) => {
+        e.stopPropagation()
+        if (window.confirm('Are you sure you want to delete this chat?')) {
+            deleteSessionMutation.mutate({sessionId})
+            // If deleting current session, clear selection
+            if (selectedSessionId === sessionId) {
+                onSelectSession('')
+            }
+        }
     }
 
     const sessions = sessionsData?.sessions ?? []
@@ -74,7 +94,7 @@ export function Sidebar({selectedSessionId, onSelectSession, onCloseSlider}: Sid
             {/* header */}
             <div className="p-4 border-b">
                 <div className="flex items-center justify-between mb-4">
-                    <h2 className="font-semibold text-lg"> Counsellor AI</h2>
+                    <h2 className="font-semibold text-lg">CareerWise AI</h2>
                 </div>
 
                 {/* new chat btn */}
@@ -90,13 +110,13 @@ export function Sidebar({selectedSessionId, onSelectSession, onCloseSlider}: Sid
             </div>
             <ScrollArea className="flex-1 py-2">
                 <div className="space-y-1 py-2">
-                {sessions.length === 0   ? (
-                    <div className="text-center text-gray-500 dark:text-gray-400  py-8">
+                {sessions.length === 0 ? (
+                    <div className="text-center text-gray-500 dark:text-gray-400 py-8">
                         <MessageSquare className="h-8 w-8 mx-auto opacity-50"/>
                         <p className="text-sm">No conversations yet</p>
-                        <p className="text-xs">Start a new chat to get career guidance</p>    
+                        <p className="text-xs">Start a new chat to get career guidance</p>
                     </div>
-                ): (
+                ) : (
                     sessions.map((session) => (
                         <div key={session.id} 
                         className={`
@@ -125,9 +145,11 @@ export function Sidebar({selectedSessionId, onSelectSession, onCloseSlider}: Sid
                                     </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
-                                    {/* implement delete functionality */}
-                                    <DropdownMenuItem className="text-red-600">
-                                    Delete chat
+                                    <DropdownMenuItem
+                                        className="text-red-600"
+                                        onClick={(e) => handleDeleteSession(session.id, e)}
+                                    >
+                                        Delete chat
                                     </DropdownMenuItem>
                                 </DropdownMenuContent>
                                 </DropdownMenu>
@@ -137,6 +159,20 @@ export function Sidebar({selectedSessionId, onSelectSession, onCloseSlider}: Sid
                 </div>
             </ScrollArea>
             <Separator/>
+                  <div className="p-4 space-y-3">
+        {/* Theme Toggle */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            {theme === 'dark' ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
+            <span className="text-sm">{theme === 'dark' ? 'Dark mode' : 'Light mode'}</span>
+          </div>
+          <Switch
+            checked={theme === 'dark'}
+            onCheckedChange={(checked) => setTheme(checked ? 'dark' : 'light')}
+          />
+        </div>
+
+        <Separator />
                 <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="w-full justify-start p-2 h-auto">
@@ -164,6 +200,7 @@ export function Sidebar({selectedSessionId, onSelectSession, onCloseSlider}: Sid
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
+        </div>
         </div>
     )
 }
