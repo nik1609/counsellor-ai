@@ -48,6 +48,12 @@ export default function SignIn () {
 
     const handleEmailPasswordAuth = async (e: React.FormEvent) => {
         e.preventDefault()
+
+        if (formData.password.length < 6) {
+            toast.error('Password must be at least 5 characters long')
+            return
+        }
+
         setLoading(true)
         try{
             if(isSignUp) {
@@ -211,6 +217,9 @@ export default function SignIn () {
                                             {showPassword ? <EyeOff className="h-4 w-4 text-gray-500"/> : <Eye className="h-4 w-4 text-gray-500"/>}
                                         </Button>
                                     </div>
+                                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                        Password must be at least 6 characters long
+                                    </p>
                                 </div>
 
                                 <Button

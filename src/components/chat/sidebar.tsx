@@ -262,10 +262,10 @@ export function Sidebar({selectedSessionId, onSelectSession, onCloseSlider}: Sid
                             </div>
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                    <Button 
-                                    variant="ghost" 
-                                    size="sm" 
-                                    className="opacity-0 group-hover:opacity-100 p-1 h-6 w-6"
+                                    <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="opacity-100 lg:opacity-0 lg:group-hover:opacity-100 p-1 h-6 w-6"
                                     >
                                     <MoreHorizontal className="h-4 w-4" />
                                     </Button>
