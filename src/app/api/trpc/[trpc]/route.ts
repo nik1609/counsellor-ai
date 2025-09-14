@@ -14,4 +14,4 @@ const handler = async (req: NextRequest) =>{
         createContext: ()=>({req,session}),
     })
 }
-export {handler as GetAnimationsOptions, handler as POST}
+export {handler as GET, handler as POST}

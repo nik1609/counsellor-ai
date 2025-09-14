@@ -1,4 +1,5 @@
 'use client'
+import { Loader2 } from "lucide-react"
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
@@ -20,14 +21,19 @@ export function AuthGuard ({children}: AuthGuardProps) {
 
     if(status === 'loading'){
         return (
-            <div className="">
-                loading
+            <div className="h-screen flex items-center justify-center">
+                <div className="text-center">
+                <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4"/>
+
+                </div>
             </div>
         )
     }
     if(status === 'unauthenticated'){
         return null
     }
-    return {children}
+    return <>
+    {children}
+    </>
 
 }
