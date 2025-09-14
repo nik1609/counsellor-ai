@@ -121,7 +121,7 @@ export function Sidebar({selectedSessionId, onSelectSession, onCloseSlider}: Sid
 
     const scrollRef = useRef<HTMLDivElement>(null)
     const [isScrolling, setIsScrolling] = useState(false)
-    const scrollTimeoutRef = useRef<NodeJS.Timeout>()
+    const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
     const handleScroll = useCallback(() => {
         if (!scrollRef.current) return
