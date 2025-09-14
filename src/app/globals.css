@@ -120,3 +120,56 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* macOS-style scrollbars - invisible by default, appear on hover/scroll */
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  .scrollbar-macos {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0,0,0,0) transparent;
+    transition: scrollbar-color 0.3s ease;
+  }
+
+  .scrollbar-macos::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .scrollbar-macos::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 10px;
+  }
+
+  .scrollbar-macos::-webkit-scrollbar-thumb {
+    background: rgba(0,0,0,0);
+    border-radius: 10px;
+    transition: background 0.3s ease;
+  }
+
+  .scrollbar-macos:hover::-webkit-scrollbar-thumb,
+  .scrollbar-macos:focus-within::-webkit-scrollbar-thumb {
+    background: rgba(0,0,0,0.2);
+  }
+
+  .dark .scrollbar-macos:hover::-webkit-scrollbar-thumb,
+  .dark .scrollbar-macos:focus-within::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.2);
+  }
+
+  /* Show scrollbar on scroll */
+  .scrollbar-macos.scrolling::-webkit-scrollbar-thumb {
+    background: rgba(0,0,0,0.2);
+  }
+
+  .dark .scrollbar-macos.scrolling::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.2);
+  }
+}

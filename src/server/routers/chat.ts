@@ -3,6 +3,7 @@ import { createTRPCRouter, protectedProcedure } from "@/lib/trpc";
 import { MessageRole } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 import {z} from 'zod'
+import { genAI } from "./openai";
 
 export const chatRouter = createTRPCRouter({
     //get sessions pagination implemented
@@ -186,5 +187,78 @@ export const chatRouter = createTRPCRouter({
             })
 
             return {success: true}
+        }),
+    // update session title
+    updateSessionTitle: protectedProcedure
+        .input(
+            z.object({
+                sessionId: z.string(),
+                title: z.string().min(1).max(100)
+            })
+        )
+        .mutation(async ({input, ctx}) => {
+            const {sessionId, title} = input
+            const userId = ctx.user.id!
+
+            // verify session exists and belongs to user
+            const session = await prisma.chatSession.findUnique({
+                where: {id: sessionId}
+            })
+
+            if(!session || session.userId !== userId) {
+                throw new TRPCError({
+                    code: 'NOT_FOUND',
+                    message: 'Session not found or unauthorized'
+                })
+            }
+
+            // update session title
+            const updatedSession = await prisma.chatSession.update({
+                where: {id: sessionId},
+                data: {title}
+            })
+
+            return updatedSession
+        }),
+    // generate smart title from first message
+    generateSessionTitle: protectedProcedure
+        .input(
+            z.object({
+                firstMessage: z.string().min(1).max(1000)
+            })
+        )
+        .mutation(async ({input}) => {
+            const {firstMessage} = input
+
+            try {
+                const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+                const prompt = `Generate a short, descriptive title (3-6 words) for a career counseling chat based on this first message: "${firstMessage}"
+
+Examples:
+- "Career Change to Tech"
+- "Interview Preparation Help"
+- "Skills Development Planning"
+- "Resume Review Discussion"
+
+Only return the title, nothing else:`;
+
+                const result = await model.generateContent(prompt);
+                const response = result.response;
+                let title = response.text().trim();
+
+                // Clean up the title (remove quotes if present)
+                title = title.replace(/^["']|["']$/g, '');
+
+                // Fallback if title is too long or empty
+                if (!title || title.length > 50) {
+                    title = "Career Discussion";
+                }
+
+                return { title };
+            } catch (error) {
+                console.error('Failed to generate title:', error);
+                return { title: "Career Discussion" };
+            }
         })
 })

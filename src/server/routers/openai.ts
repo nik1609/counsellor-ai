@@ -1,8 +1,6 @@
-import OpenAI from 'openai'
+import { GoogleGenerativeAI } from '@google/generative-ai'
 
-export const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-})
+export const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
 
 export const CAREER_COUNSELOR_SYSTEM_PROMPT = `You are an experienced career counselor and advisor. You provide thoughtful, actionable career guidance to help people navigate their professional journey.
 

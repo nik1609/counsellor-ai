@@ -27,7 +27,7 @@ export function ChatArea({sessionId}: ChatAreaProps) {
     const utils = trpc.useContext()
 
     // fetch message for the session
-    const {data: messageData} = trpc.chat.getMessages.useQuery(
+    const {data: messageData, isLoading: isLoadingMessages} = trpc.chat.getMessages.useQuery(
         {sessionId: sessionId!, limit:50},
         {enabled: !!sessionId}
     )
@@ -40,6 +40,10 @@ export function ChatArea({sessionId}: ChatAreaProps) {
             // Invalidate queries to refresh messages and sessions
             utils.chat.getMessages.invalidate({sessionId: sessionId!})
             utils.chat.getSessions.invalidate()
+            // Force refetch sessions to see title updates
+            setTimeout(() => {
+                utils.chat.getSessions.refetch()
+            }, 1000)
         },
         onError: () => {
             toast.error('Failed to generate AI response')
@@ -123,9 +127,23 @@ export function ChatArea({sessionId}: ChatAreaProps) {
     return(
         <div className="flex-1 flex flex-col bg-white dark:bg-gray-900 h-full overflow-hidden">
             {/* messages */}
-            <ScrollArea ref={scrollAreaRef} className="flex-1 p-4 overflow-y-auto">
+            <ScrollArea ref={scrollAreaRef} className="flex-1 p-4 overflow-y-auto scrollbar-macos">
                 <div className="space-y-6 max-w-4xl mx-auto">
-                    {messages.length === 0 ? (
+                    {isLoadingMessages ? (
+                        <div className="space-y-6">
+                            {Array.from({length: 3}).map((_, i) => (
+                                <div key={i} className="animate-pulse">
+                                    <div className="flex gap-4 justify-start">
+                                        <div className="w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
+                                        <div className="flex-1 space-y-2">
+                                            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+                                            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : messages.length === 0 ? (
                     <div className="text-center py-12">
                         <Bot className="h-12 w-12 mx-auto mb-4 text-gray-400" />
                         <h3 className="text-lg font-medium mb-2">Start your career conversation</h3>
@@ -220,7 +238,11 @@ export function ChatArea({sessionId}: ChatAreaProps) {
               size="sm"
               className="absolute right-2 bottom-2"
             >
-              <Send className="h-4 w-4" />
+              {isLoading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Send className="h-4 w-4" />
+              )}
             </Button>
           </div>
           <p className="text-xs text-gray-500 mt-2 text-center">

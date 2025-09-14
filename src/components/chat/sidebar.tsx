@@ -3,11 +3,11 @@
 import { trpc } from "@/lib/trpc-client"
 import { signOut, useSession } from "next-auth/react"
 import { useTheme } from "next-themes"
-import { useState } from "react"
+import { useState, useCallback, useRef } from "react"
+import { Input } from "../ui/input"
 import { toast } from "sonner"
 import { Button } from "../ui/button"
-import { LogOut, MessageSquare, Moon, MoreHorizontal, Plus, Settings, Sun, User } from "lucide-react"
-import { ScrollArea } from "@radix-ui/react-scroll-area"
+import { Edit2, LogOut, MessageSquare, Moon, MoreHorizontal, Plus, Settings, Sun, User } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu"
 import { Separator } from "../ui/separator"
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
@@ -21,15 +21,24 @@ interface SidebarProps {
 export function Sidebar({selectedSessionId, onSelectSession, onCloseSlider}: SidebarProps){
 
     const [isCreatingSession, setIsCreatingSession] = useState(false)
+    const [editingSessionId, setEditingSessionId] = useState<string | null>(null)
+    const [editTitle, setEditTitle] = useState('')
     const {data: session} = useSession()
     const {theme, setTheme} = useTheme()
 
     const utils = trpc.useContext()
 
-    //fetch chat sessions
-    const {data: sessionsData} = trpc.chat.getSessions.useQuery(
-        {limit:20},
+    //fetch chat sessions with infinite query
+    const {
+        data: sessionsData,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
+        isLoading: isLoadingSessions
+    } = trpc.chat.getSessions.useInfiniteQuery(
+        {limit: 20},
         {
+            getNextPageParam: (lastPage) => lastPage.nextCursor,
             staleTime: 5*60*1000,
             refetchOnWindowFocus: false
         }
@@ -77,7 +86,66 @@ export function Sidebar({selectedSessionId, onSelectSession, onCloseSlider}: Sid
         }
     }
 
-    const sessions = sessionsData?.sessions ?? []
+    const sessions = sessionsData?.pages.flatMap(page => page.sessions) ?? []
+
+    const updateSessionTitleMutation = trpc.chat.updateSessionTitle.useMutation({
+        onSuccess: () => {
+            utils.chat.getSessions.invalidate()
+            toast.success('Session title updated!')
+            setEditingSessionId(null)
+            setEditTitle('')
+        },
+        onError: () => {
+            toast.error('Failed to update session title')
+        }
+    })
+
+    const handleEditTitle = (sessionId: string, currentTitle: string) => {
+        setEditingSessionId(sessionId)
+        setEditTitle(currentTitle)
+    }
+
+    const handleSaveTitle = () => {
+        if (editingSessionId && editTitle.trim()) {
+            updateSessionTitleMutation.mutate({
+                sessionId: editingSessionId,
+                title: editTitle.trim()
+            })
+        }
+    }
+
+    const handleCancelEdit = () => {
+        setEditingSessionId(null)
+        setEditTitle('')
+    }
+
+    const scrollRef = useRef<HTMLDivElement>(null)
+    const [isScrolling, setIsScrolling] = useState(false)
+    const scrollTimeoutRef = useRef<NodeJS.Timeout>()
+
+    const handleScroll = useCallback(() => {
+        if (!scrollRef.current) return
+
+        // Show scrollbar while scrolling
+        setIsScrolling(true)
+
+        // Clear existing timeout
+        if (scrollTimeoutRef.current) {
+            clearTimeout(scrollTimeoutRef.current)
+        }
+
+        // Hide scrollbar after scroll ends
+        scrollTimeoutRef.current = setTimeout(() => {
+            setIsScrolling(false)
+        }, 1000)
+
+        const { scrollTop, scrollHeight, clientHeight } = scrollRef.current
+        const isNearBottom = scrollTop + clientHeight >= scrollHeight - 10
+
+        if (isNearBottom && hasNextPage && !isFetchingNextPage) {
+            fetchNextPage()
+        }
+    }, [fetchNextPage, hasNextPage, isFetchingNextPage])
 
     const handleSignOut = async () =>{
         try {
@@ -90,7 +158,7 @@ export function Sidebar({selectedSessionId, onSelectSession, onCloseSlider}: Sid
 
 
     return (
-        <div className="h-full bg-gray-50 dark:bg-gray-800 border-r flex flex-col">
+        <div className="h-screen bg-gray-50 dark:bg-gray-800 border-r flex flex-col overflow-hidden">
             {/* header */}
             <div className="p-4 border-b">
                 <div className="flex items-center justify-between mb-4">
@@ -108,9 +176,27 @@ export function Sidebar({selectedSessionId, onSelectSession, onCloseSlider}: Sid
                     {isCreatingSession ? 'Creating...' : 'New Chat'}
                 </Button>
             </div>
-            <ScrollArea className="flex-1 py-2">
+            <div
+                ref={scrollRef}
+                className={`flex-1 overflow-y-auto py-2 scrollbar-macos ${isScrolling ? 'scrolling' : ''}`}
+                onScroll={handleScroll}
+            >
                 <div className="space-y-1 py-2">
-                {sessions.length === 0 ? (
+                {isLoadingSessions ? (
+                    <div className="space-y-2 px-3">
+                        {Array.from({length: 6}).map((_, i) => (
+                            <div key={i} className="animate-pulse">
+                                <div className="flex items-center space-x-3 py-2">
+                                    <div className="w-4 h-4 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                                    <div className="flex-1 space-y-1">
+                                        <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+                                        <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                ) : sessions.length === 0 ? (
                     <div className="text-center text-gray-500 dark:text-gray-400 py-8">
                         <MessageSquare className="h-8 w-8 mx-auto opacity-50"/>
                         <p className="text-sm">No conversations yet</p>
@@ -129,10 +215,29 @@ export function Sidebar({selectedSessionId, onSelectSession, onCloseSlider}: Sid
                         >
                             <MessageSquare className="h-4 w-4 text-gray-500 flex-shrink-0"/>
                             <div className="flex-1 min-w-0">
-                                <p className="text-sm font-medium truncate">{session.title}</p>
-                                <p className="text-xs text-gray-500 dark:text-gray-400">
-                                    {new Date(session.updatedAt).toLocaleDateString()}
-                                </p>
+                                {editingSessionId === session.id ? (
+                                    <div className="space-y-1">
+                                        <Input
+                                            value={editTitle}
+                                            onChange={(e) => setEditTitle(e.target.value)}
+                                            className="text-sm h-6 p-1"
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter') handleSaveTitle()
+                                                if (e.key === 'Escape') handleCancelEdit()
+                                            }}
+                                            onBlur={handleSaveTitle}
+                                            autoFocus
+                                            onClick={(e) => e.stopPropagation()}
+                                        />
+                                    </div>
+                                ) : (
+                                    <>
+                                        <p className="text-sm font-medium truncate">{session.title}</p>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                                            {new Date(session.updatedAt).toLocaleDateString()}
+                                        </p>
+                                    </>
+                                )}
                             </div>
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
@@ -146,6 +251,15 @@ export function Sidebar({selectedSessionId, onSelectSession, onCloseSlider}: Sid
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent align="end">
                                     <DropdownMenuItem
+                                        onClick={(e) => {
+                                            e.stopPropagation()
+                                            handleEditTitle(session.id, session.title)
+                                        }}
+                                    >
+                                        <Edit2 className="mr-2 h-4 w-4" />
+                                        Edit title
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem
                                         className="text-red-600"
                                         onClick={(e) => handleDeleteSession(session.id, e)}
                                     >
@@ -156,8 +270,15 @@ export function Sidebar({selectedSessionId, onSelectSession, onCloseSlider}: Sid
                         </div>
                     ))
                 )}
+
+                {/* Loading indicator for infinite scroll */}
+                {isFetchingNextPage && (
+                    <div className="text-center py-4">
+                        <div className="text-sm text-gray-500">Loading more...</div>
+                    </div>
+                )}
                 </div>
-            </ScrollArea>
+            </div>
             <Separator/>
                   <div className="p-4 space-y-3">
         {/* Theme Toggle */}
