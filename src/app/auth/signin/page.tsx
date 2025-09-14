@@ -113,7 +113,7 @@ export default function SignIn () {
             variant="outline"
             >
                 <Chrome className="mr-2 h-4 w-4"/>
-                Conitue with Google
+                Continue with Google
             </Button>
             <div className="relative">
                 <div className="absolute inset-0 flex items-center">
