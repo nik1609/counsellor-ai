@@ -261,7 +261,7 @@ export default function SignIn () {
 
                             {/* Features preview inside card */}
                             <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 mt-6">
-                                <p className="text-xs text-gray-600 dark:text-gray-400 text-center mb-3 -ml-11">
+                                <p className="text-xs text-gray-600 dark:text-gray-400 mb-3">
                                     Join thousands of professionals using CareerGenie for:
                                 </p>
                                 <div className="grid grid-cols-2 gap-2 text-xs">

@@ -7,7 +7,7 @@ import { useState, useCallback, useRef } from "react"
 import { Input } from "../ui/input"
 import { toast } from "sonner"
 import { Button } from "../ui/button"
-import { Edit2, LogOut, MessageSquare, Moon, MoreHorizontal, Settings, Sparkles, SquarePen, Sun, Trash2, User } from "lucide-react"
+import { Edit2, LogOut, MessageSquare, Moon, MoreHorizontal, Settings, Sparkles, SquarePen, Sun, Trash2, User, X } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu"
 import { Separator } from "../ui/separator"
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
@@ -161,11 +161,22 @@ export function Sidebar({selectedSessionId, onSelectSession, onCloseSlider}: Sid
         <div className="h-screen bg-gray-50 dark:bg-gray-800 border-r flex flex-col overflow-hidden">
             {/* header */}
             <div className="p-4 border-b">
-                <div className="flex items-center justify-start mb-4">
-                    <div className="flex items-center justify-center mr-2 w-6 h-6 text-black dark:text-white rounded-md">
-                        <Sparkles className="w-4 h-4 text-black dark:text-white"/>
+                <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center">
+                        <div className="flex items-center justify-center mr-2 w-6 h-6 text-black dark:text-white rounded-md">
+                            <Sparkles className="w-4 h-4 text-black dark:text-white"/>
+                        </div>
+                        <h2 className="font-semibold text-lg">CareerGenie AI</h2>
                     </div>
-                    <h2 className="font-semibold text-lg">CareerGenie AI</h2>
+                    {/* Collapse button - Mobile only */}
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={onCloseSlider}
+                        className="sm:hidden p-1 h-6 w-6 hover:bg-gray-200 dark:hover:bg-gray-700"
+                    >
+                        <X className="h-4 w-4" />
+                    </Button>
                 </div>
 
                 {/* new chat btn */}
