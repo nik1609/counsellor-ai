@@ -50,7 +50,7 @@ export default function SignIn () {
         e.preventDefault()
 
         if (formData.password.length < 6) {
-            toast.error('Password must be at least 5 characters long')
+            toast.error('Password must be at least 6 characters long')
             return
         }
 
