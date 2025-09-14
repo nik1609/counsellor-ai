@@ -7,7 +7,7 @@ import { useState, useCallback, useRef } from "react"
 import { Input } from "../ui/input"
 import { toast } from "sonner"
 import { Button } from "../ui/button"
-import { Edit2, LogOut, MessageSquare, Moon, MoreHorizontal, Plus, Settings, Sun, User } from "lucide-react"
+import { Edit2, LogOut, MessageSquare, Moon, MoreHorizontal, Settings, Sparkles, SquarePen, Sun, Trash2, User } from "lucide-react"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu"
 import { Separator } from "../ui/separator"
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
@@ -161,20 +161,30 @@ export function Sidebar({selectedSessionId, onSelectSession, onCloseSlider}: Sid
         <div className="h-screen bg-gray-50 dark:bg-gray-800 border-r flex flex-col overflow-hidden">
             {/* header */}
             <div className="p-4 border-b">
-                <div className="flex items-center justify-between mb-4">
-                    <h2 className="font-semibold text-lg">CareerWise AI</h2>
+                <div className="flex items-center justify-start mb-4">
+                    <div className="flex items-center justify-center mr-2 w-6 h-6 text-black dark:text-white rounded-md">
+                        <Sparkles className="w-4 h-4 text-black dark:text-white"/>
+                    </div>
+                    <h2 className="font-semibold text-lg">CareerGenie AI</h2>
                 </div>
 
                 {/* new chat btn */}
-                <Button
+                <div
                     onClick={handleCreateSession}
-                    disabled={isCreatingSession}
-                    className="w-full justify-start"
-                    variant={"outline"}
-                    >
-                    <Plus className="w-4 h-4 mr-2"/>
-                    {isCreatingSession ? 'Creating...' : 'New Chat'}
-                </Button>
+                    className={`
+                        flex items-center space-x-3 px-3 py-2 rounded-lg cursor-pointer transition-colors group
+                        border border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50
+                        hover:bg-gray-100 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-600
+                        ${isCreatingSession ? 'opacity-50 cursor-not-allowed' : ''}
+                    `}
+                >
+                    <SquarePen className="h-4 w-4 text-gray-500 flex-shrink-0"/>
+                    <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium">
+                            {isCreatingSession ? 'Creating...' : 'New Chat'}
+                        </p>
+                    </div>
+                </div>
             </div>
             <div
                 ref={scrollRef}
@@ -206,7 +216,7 @@ export function Sidebar({selectedSessionId, onSelectSession, onCloseSlider}: Sid
                     sessions.map((session) => (
                         <div key={session.id} 
                         className={`
-                            group flex items-center space-x-3 px-3 py-2 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${selectedSessionId === session.id ? " bg-gray-100 dark:bg-gray-700 border-l-2 border-blue-500" : ""}
+                            group flex items-center space-x-3 px-3 ml-4 mr-1.5 py-2 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${selectedSessionId === session.id ? " bg-gray-100 dark:bg-gray-700 border-l-2 border-gray-500" : ""}
                             `}
                             onClick={()=>{
                                 onSelectSession(session.id)
@@ -263,6 +273,7 @@ export function Sidebar({selectedSessionId, onSelectSession, onCloseSlider}: Sid
                                         className="text-red-600"
                                         onClick={(e) => handleDeleteSession(session.id, e)}
                                     >
+                                        <Trash2 className="mr-2 h-4 w-4" />
                                         Delete chat
                                     </DropdownMenuItem>
                                 </DropdownMenuContent>

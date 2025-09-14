@@ -108,7 +108,7 @@ export function ChatArea({sessionId}: ChatAreaProps) {
         <div className="text-center max-w-md mx-auto p-8">
           <Bot className="h-16 w-16 mx-auto mb-4 text-gray-400" />
           <h2 className="text-2xl font-semibold mb-2 text-gray-900 dark:text-white">
-            Welcome to CareerWise AI
+            Welcome to CareerGenie AI
           </h2>
           <p className="text-gray-600 dark:text-gray-300 mb-6">
             Get personalized career guidance and advice from our AI counselor. 
@@ -228,7 +228,7 @@ export function ChatArea({sessionId}: ChatAreaProps) {
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Ask me about your career goals, job search strategies, interview tips, or anything else..."
+              placeholder="Ask about your career..."
               className="pr-12 min-h-[60px] max-h-[120px] resize-none"
               disabled={isLoading}
             />
@@ -236,7 +236,7 @@ export function ChatArea({sessionId}: ChatAreaProps) {
               onClick={handleSendMessage}
               disabled={!message.trim() || isLoading}
               size="sm"
-              className="absolute right-2 bottom-2"
+              className="absolute right-2 bottom-3"
             >
               {isLoading ? (
                 <Loader2 className="h-4 w-4 animate-spin" />

@@ -1,4 +1,4 @@
-# CareerWise AI - AI Career Counseling Chat Application
+# CareerGenie - AI Career Counseling Chat Application
 
 A modern, responsive chat application that provides personalized career guidance through AI-powered conversations. Built with Next.js, TypeScript, and Google Gemini AI.
 
@@ -211,7 +211,6 @@ npx prisma studio
 
 ### Current Limitations
 - AI responses are rate-limited by Gemini free tier
-- Session titles are generated only on first message
 
 ### Planned Enhancements
 - Real-time typing indicators
@@ -230,7 +229,7 @@ npx prisma studio
 
 ## 📄 License
 
-This project is licensed under the MIT License.
+This project is proprietary.
 
 ## 🙋‍♂️ Support
 
@@ -238,4 +237,4 @@ For questions or support, please open an issue on GitHub.
 
 ---
 
-Built with ❤️ using modern web technologies and AI integration.
+A professional AI-powered career counseling platform.

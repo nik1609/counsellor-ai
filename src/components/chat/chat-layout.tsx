@@ -39,7 +39,7 @@ export function ChatLayout() {
             >
                 <Menu className="h-4 w-4"/>
             </Button>
-        <h1 className="ml-2 font-semibold">CareerWise AI</h1>
+        <h1 className="ml-2 font-semibold">CareerGenie AI</h1>
 
         </div>
         <ChatArea sessionId={selectedSessionId}/>

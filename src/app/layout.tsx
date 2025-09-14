@@ -12,7 +12,7 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: "CareerWise AI",
+  title: "Career Genie AI",
   description: "Get personalized career guidance and advice from our AI counselor",
 };
 
