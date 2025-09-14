@@ -50,7 +50,7 @@ A modern, responsive chat application that provides personalized career guidance
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/yourusername/counsellor-ai.git
+git clone https://github.com/nik1609/counsellor-ai.git
 cd counsellor-ai
 ```
 
