@@ -17,7 +17,6 @@ A modern, responsive chat application that provides personalized career guidance
 - **Responsive Design**: Works perfectly on desktop, tablet, and mobile
 - **Real-time Updates**: Instant message delivery and session updates
 - **Loading States**: Smooth loading indicators throughout the app
-- **macOS-style Scrollbars**: Invisible scrollbars that appear only when needed
 
 ### Advanced Features
 - **Session Management**: Edit session titles, delete conversations
@@ -163,7 +162,6 @@ Built with Shadcn/ui components:
 - Automatic timestamp updates
 
 ### User Experience
-- macOS-style invisible scrollbars
 - Smooth loading animations
 - Responsive design for all screen sizes
 - Dark/light theme with system preference detection
@@ -218,6 +216,7 @@ npx prisma studio
 - Export chat conversations
 - Advanced AI personality customization
 - Voice message support
+  
 
 ## 🤝 Contributing
 
