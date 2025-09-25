@@ -37,7 +37,7 @@ export const aiRouter = createTRPCRouter({
 
                 // Create conversation history for Gemini
                 const model = genAI.getGenerativeModel({
-                    model: "gemini-1.5-flash",
+                    model: "gemini-2.0-flash-001",
                     systemInstruction: CAREER_COUNSELOR_SYSTEM_PROMPT
                 });
 
@@ -88,7 +88,7 @@ export const aiRouter = createTRPCRouter({
                 if (userMessages.length === 1) {
                     console.log('Generating title for first user message:', userMessage);
                     try {
-                        const titleModel = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+                        const titleModel = genAI.getGenerativeModel({ model: "gemini-2.0-flash-001" });
                         const titlePrompt = `Generate a short, descriptive title (3-6 words) for a career counseling chat based on this message: "${userMessage}"\n\nExamples:\n- "Career Change to Tech"\n- "Interview Preparation Help"\n- "Skills Development Planning"\n- "Resume Review Discussion"\n\nOnly return the title, nothing else:`;
 
                         const titleResult = await titleModel.generateContent(titlePrompt);
